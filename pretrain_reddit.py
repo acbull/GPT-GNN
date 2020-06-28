@@ -85,6 +85,7 @@ train_target_nodes = np.concatenate([train_target_nodes, np.ones(len(train_targe
 
 
 
+
 def GPT_sample(seed, target_nodes, time_range, batch_size, feature_extractor):
     np.random.seed(seed)
     samp_target_nodes = target_nodes[np.random.choice(len(target_nodes), batch_size)]
@@ -104,17 +105,49 @@ def GPT_sample(seed, target_nodes, time_range, batch_size, feature_extractor):
             ori_list[source_type][relation_type] = np.array(edge_list[target_type][source_type][relation_type])
             el = []
             for target_ser, source_ser in edge_list[target_type][source_type][relation_type]:
-                if relation_type not in rel_stop_list and target_ser < batch_size and \
-                       np.random.random() > threshold and target_ser < source_ser:
-                    rem_edge_list[source_type][relation_type] += [[target_ser, source_ser]]
-                    continue
-                el += [[target_ser, source_ser]]
-                el += [[source_ser, target_ser]]
+                if target_ser < source_ser:
+                    if relation_type not in rel_stop_list and target_ser < batch_size and \
+                           np.random.random() > threshold:
+                        rem_edge_list[source_type][relation_type] += [[target_ser, source_ser]]
+                        continue
+                    el += [[target_ser, source_ser]]
+                    el += [[source_ser, target_ser]]
             el = np.array(el)
             edge_list[target_type][source_type][relation_type] = el
             
             if relation_type == 'self':
                 continue
+                
+    '''
+        Adding feature nodes:
+    '''
+    n_target_nodes = len(feature[target_type])
+    feature[target_type] = np.concatenate((feature[target_type], np.zeros([batch_size, feature[target_type].shape[1]])))
+    times[target_type]   = np.concatenate((times[target_type], times[target_type][:batch_size]))
+
+    for source_type in edge_list[target_type]:
+        for relation_type in edge_list[target_type][source_type]:
+            el = []
+            for target_ser, source_ser in edge_list[target_type][source_type][relation_type]:
+                if target_ser < batch_size:
+                    if relation_type == 'self':
+                        el += [[target_ser + n_target_nodes, target_ser + n_target_nodes]]
+                    else:
+                        el += [[target_ser + n_target_nodes, source_ser]]
+            if len(el) > 0:
+                edge_list[target_type][source_type][relation_type] = \
+                    np.concatenate((edge_list[target_type][source_type][relation_type], el))
+
+
+    rem_edge_lists = {}
+    for source_type in rem_edge_list:
+        rem_edge_lists[source_type] = {}
+        for relation_type in rem_edge_list[source_type]:
+            rem_edge_lists[source_type][relation_type] = np.array(rem_edge_list[source_type][relation_type])
+    del rem_edge_list
+          
+    return to_torch(feature, times, edge_list, graph), rem_edge_lists, ori_list, \
+            attr[:batch_size], (n_target_nodes, n_target_nodes + batch_size)
 
 
 
