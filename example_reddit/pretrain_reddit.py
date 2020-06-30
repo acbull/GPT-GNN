@@ -212,6 +212,7 @@ if args.scheduler == 'cycle':
 elif args.scheduler == 'cosine':
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, repeat_num * args.n_batch, eta_min=1e-6)
 
+print('Start Pretraining...')
 for epoch in np.arange(args.n_epoch) + 1:
     gpt_gnn.neg_queue_size = args.queue_size * epoch // args.n_epoch
     for batch in np.arange(repeat_num) + 1:
@@ -285,5 +286,5 @@ for epoch in np.arange(args.n_epoch) + 1:
         if valid_loss < best_val:
             best_val = valid_loss
             print('UPDATE!!!')
-            torch.save(gpt_gnn, args.pretrain_model_dir)
+            torch.save(gpt_gnn.state_dict(), args.pretrain_model_dir)
         stats += [[np.average(train_link_losses),  loss_link, loss_attr, valid_loss]]

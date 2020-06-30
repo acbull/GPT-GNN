@@ -299,5 +299,5 @@ for epoch in np.arange(args.n_epoch) + 1:
         if valid_loss < best_val:
             best_val = valid_loss
             print('UPDATE!!!')
-            torch.save(gpt_gnn, args.pretrain_model_dir)
+            torch.save(gpt_gnn.state_dict(), args.pretrain_model_dir)
         stats += [[np.average(train_link_losses),  loss_link, loss_attr, valid_loss]]
