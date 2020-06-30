@@ -50,9 +50,10 @@ For both pre-training and fine-tuning, we provide arguments to control model and
 ```
   --conv_name                      STR     Name of GNN filter (model)                           Default is hgt.
   --scheduler                      STR     Name of learning rate scheduler                      Default is cycle (for pretrain) and cosine (for fine-tuning)
-  --last_norm                      INT     Whether to use layer-norm on the last layer.         Default is False.
+  --n_hid                          INT     Number of hidden dimension                           Default is 400.
   --n_layers                       INT     Number of GNN layers                                 Default is 3.
-  --prev_norm                      Bool    Whether to use layer-norm on previous layers.        Default is False.
+  --prev_norm                      BOOL    Whether to use layer-norm on previous layers.        Default is False.
+  --last_norm                      BOOL    Whether to use layer-norm on the last layer.         Default is False.
   --max_lr                         FLOAT   Maximum learning rate.                               Default is 1e-3 (for pretrain) and 5e-4 (for fine-tuning).  
 ```  
 
