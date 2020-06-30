@@ -39,10 +39,10 @@ For pre-training, we provide arguments to control different modules for attribut
 
 For datasets, we provide arguments to control mini-batch sampling:
 ```
-  --data_dir                       STR   The address of preprocessed graph.
+  --data_dir                       STR     The address of preprocessed graph.
   --pretrain_model_dir             STR     The address for storing the pre-trained models.
   --sample_depth                   INT     How many layers within a mini-batch subgraph         Default is 6.
-  --sample_width                   INT   How many nodes to be sampled per layer per type        Default is 128.
+  --sample_width                   INT     How many nodes to be sampled per layer per type      Default is 128.
 ```  
 
 For both pre-training and fine-tuning, we provide arguments to control model and optimizer hyperparameters. We highlight some key arguments below:
