@@ -1,7 +1,7 @@
 # GPT-GNN: Generative Pre-Training of Graph Neural Networks
 
 <p align="center">
-  <img src="./gpt-intro.png" width="600">
+  <img src="images/gpt-intro.png" width="600">
   <br />
   <br />
 </p>
@@ -59,7 +59,7 @@ For both pre-training and fine-tuning, we provide arguments to control model and
 
 The following commands pretrain a 3-layer HGT over OAG-CS:
 <p align="center">
-  <img width="800" src="pretrain_OAG.gif">
+  <img width="800" src="images/pretrain_OAG.gif">
 </p>
 
 ## Pre-trained Models
