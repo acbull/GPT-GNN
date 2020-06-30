@@ -1,7 +1,6 @@
 import sys
-from data import *
-from utils import *
-from model import *
+from GPT_GNN.data import *
+from GPT_GNN.model import *
 from warnings import filterwarnings
 filterwarnings("ignore")
 
@@ -111,22 +110,6 @@ def prepare_data(pool):
     jobs.append(p)
     return jobs
 
-
-'''
-    Initialize GNN (model is specified by conv_name) and Classifier
-'''
-gnn = GNN(conv_name = args.conv_name, in_dim = len(graph.node_feature[target_type]['emb'].values[0]), n_hid = args.n_hid, \
-          n_heads = args.n_heads, n_layers = args.n_layers, dropout = args.dropout, num_types = len(types), \
-          num_relations = len(graph.get_meta_graph()) + 1, prev_norm = args.prev_norm, last_norm = args.last_norm, use_RTE = False)
-if args.use_pretrain:
-    gnn.load_state_dict(torch.load(args.pretrain_model_dir).gnn.state_dict())
-classifier = Classifier(args.n_hid, len(cand_list)).to(device)
-
-model = nn.Sequential(gnn, classifier)
-
-
-optimizer = torch.optim.AdamW(model.parameters(), lr = 5e-4)
-
 stats = []
 res = []
 best_val   = 0
@@ -136,7 +119,29 @@ pool = mp.Pool(args.n_pool)
 st = time.time()
 jobs = prepare_data(pool)
 
-scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, 500, eta_min=1e-6)
+
+'''
+    Initialize GNN (model is specified by conv_name) and Classifier
+'''
+gnn = GNN(conv_name = args.conv_name, in_dim = len(graph.node_feature[target_type]['emb'].values[0]), n_hid = args.n_hid, \
+          n_heads = args.n_heads, n_layers = args.n_layers, dropout = args.dropout, num_types = len(types), \
+          num_relations = len(graph.get_meta_graph()) + 1, prev_norm = args.prev_norm, last_norm = args.last_norm, use_RTE = False)
+if args.use_pretrain:
+    gnn.load_state_dict(torch.load(args.pretrain_model_dir).gnn.state_dict(), strict = False)
+classifier = Classifier(args.n_hid, len(cand_list)).to(device)
+
+model = nn.Sequential(gnn, classifier)
+
+
+optimizer = torch.optim.AdamW(model.parameters(), lr = 5e-4)
+
+
+
+if args.scheduler == 'cycle':
+    scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, pct_start=0.02, anneal_strategy='linear', final_div_factor=100,\
+                        max_lr = args.max_lr, total_steps = args.n_batch * args.n_epoch + 1)
+elif args.scheduler == 'cosine':
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, 500, eta_min=1e-6)
 
 
 for epoch in np.arange(args.n_epoch) + 1:

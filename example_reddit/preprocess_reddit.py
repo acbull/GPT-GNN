@@ -18,7 +18,7 @@ for i in n:
 x = np.concatenate((dataset.data.x.numpy(), np.log(degree).reshape(-1, 1)), axis=-1)
 graph_reddit.node_feature['def'] = pd.DataFrame({'emb': list(x)})
 
-idx = np.arange(len(graph.node_feature[target_type]))
+idx = np.arange(len(graph_reddit.node_feature[target_type]))
 np.random.seed(43)
 np.random.shuffle(idx)
 

@@ -9,14 +9,33 @@ import argparse
 parser = argparse.ArgumentParser(description='Pre-training HGT on a given graph (heterogeneous / homogeneous)')
 
 '''
+   GPT-GNN arguments 
+'''
+parser.add_argument('--attr_ratio', type=float, default=0.5,
+                    help='Ratio of attr-loss against link-loss, range: [0-1]') 
+parser.add_argument('--attr_type', type=str, default='vec',
+                    choices=['text', 'vec'],
+                    help='The type of attribute decoder')
+parser.add_argument('--neg_samp_num', type=int, default=255,
+                    help='Maximum number of negative sample for each target node.')
+parser.add_argument('--queue_size', type=int, default=256,
+                    help='Max size of adaptive embedding queue.')
+
+'''
     Dataset arguments
 '''
 parser.add_argument('--data_dir', type=str, default='/datadrive/dataset/graph_reddit.pk',
                     help='The address of preprocessed graph.')
-parser.add_argument('--model_dir', type=str, default='/datadrive/models/gpt_all_reddit',
-                    help='The address for storing the models and optimization results.')
+parser.add_argument('--pretrain_model_dir', type=str, default='/datadrive/models/gpt_all_reddit',
+                    help='The address for storing the pre-trained models.')
 parser.add_argument('--cuda', type=int, default=1,
                     help='Avaiable GPU ID')      
+parser.add_argument('--sample_depth', type=int, default=6,
+                    help='How many layers within a mini-batch subgraph')
+parser.add_argument('--sample_width', type=int, default=128,
+                    help='How many nodes to be sampled per layer per type')
+
+
 '''
    Model arguments 
 '''
@@ -33,23 +52,15 @@ parser.add_argument('--prev_norm', help='Whether to add layer-norm on the previo
 parser.add_argument('--last_norm', help='Whether to add layer-norm on the last layers',     action='store_true')
 parser.add_argument('--dropout', type=int, default=0.2,
                     help='Dropout ratio')
-parser.add_argument('--queue_size', type=int, default=256,
-                    help='Max size of negative queue')
-parser.add_argument('--sample_depth', type=int, default=6,
-                    help='How many numbers to sample the graph')
-parser.add_argument('--sample_width', type=int, default=128,
-                    help='How many `nodes to be sampled per layer per type')
-parser.add_argument('--attr_type', type=str, default='vec',
-                    choices=['text', 'vec'],
-                    help='The type of attribute decoder')
-parser.add_argument('--neg_samp_num', type=int, default=255,
-                    help='Maximum number of negative sample within one batch.')
+
 
 '''
     Optimization arguments
 '''
 parser.add_argument('--max_lr', type=float, default=1e-3,
                     help='Maximum learning rate.')
+parser.add_argument('--scheduler', type=str, default='cycle',
+                    help='Name of learning rate scheduler.' , choices=['cycle', 'cosine'])
 parser.add_argument('--n_epoch', type=int, default=20,
                     help='Number of epoch to run')
 parser.add_argument('--n_pool', type=int, default=8,
@@ -60,8 +71,6 @@ parser.add_argument('--batch_size', type=int, default=256,
                     help='Number of output nodes for training')    
 parser.add_argument('--clip', type=float, default=0.5,
                     help='Gradient Norm Clipping') 
-parser.add_argument('--attr_ratio', type=float, default=0.5,
-                    help='Ratio of attr-loss against link-loss, range: [0-1]') 
 args = parser.parse_args()
 
 if args.cuda != -1:
@@ -154,6 +163,14 @@ def prepare_data(pool):
     jobs.append(pool.apply_async(GPT_sample, args=(randint(), train_target_nodes, {1: True}, args.batch_size, feature_reddit)))
     return jobs
 
+best_val   = 100000
+train_step = 0
+stats = []
+pool = mp.Pool(args.n_pool)
+st = time.time()
+jobs = prepare_data(pool)
+repeat_num = int(len(pre_target_nodes) / args.batch_size // args.n_batch)
+
 
 data, rem_edge_list, ori_edge_list, _, _ = GPT_sample(randint(), pre_target_nodes, {1: True}, args.batch_size, feature_reddit)
 node_feature, node_type, edge_time, edge_index, edge_type, node_dict, edge_dict = data
@@ -181,20 +198,15 @@ gpt_gnn = gpt_gnn.to(device)
 
 
 
-best_val   = 100000
-train_step = 0
-stats = []
+optimizer = torch.optim.AdamW(gpt_gnn.parameters(), weight_decay = 1e-2, eps=1e-06, lr = args.max_lr)
 
-optimizer = torch.optim.AdamW(gpt_gnn.parameters(), weight_decay = 1e-2, eps=1e-06)
 
-pool = mp.Pool(args.n_pool)
-st = time.time()
-jobs = prepare_data(pool)
-repeat_num = int(len(pre_target_nodes) / args.batch_size // args.n_batch)
 
-scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, pct_start=0.02, anneal_strategy='linear', final_div_factor=100,\
+if args.scheduler == 'cycle':
+    scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, pct_start=0.02, anneal_strategy='linear', final_div_factor=100,\
                         max_lr = args.max_lr, total_steps = repeat_num * args.n_batch * args.n_epoch + 1)
-
+elif args.scheduler == 'cosine':
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, repeat_num * args.n_batch, eta_min=1e-6)
 
 for epoch in np.arange(args.n_epoch) + 1:
     gpt_gnn.neg_queue_size = args.queue_size * epoch // args.n_epoch
@@ -269,5 +281,5 @@ for epoch in np.arange(args.n_epoch) + 1:
         if valid_loss < best_val:
             best_val = valid_loss
             print('UPDATE!!!')
-            torch.save(gpt_gnn, args.model_dir)
+            torch.save(gpt_gnn, args.pretrain_model_dir)
         stats += [[np.average(train_link_losses),  loss_link, loss_attr, valid_loss]]
