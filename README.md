@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./gpt-intro.png" width="800">
+  <img src="./gpt-intro.png" width="750">
   <br />
   <br />
 </p>
@@ -37,7 +37,7 @@ You can see our KDD 2020 paper [“**Generative Pre-Training of Graph Neural Net
 
 
 
-### Citation
+### Reference
 
 Please consider citing the following paper when using our code for your application.
 
