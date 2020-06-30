@@ -21,13 +21,40 @@ Within each example_* package, there is a pretrain_* file for pre-training a GNN
 
 ## DataSet
 For **Open Academic Graph (OAG)**, we provide a heterogeneous graph containing highly-cited CS papers (8.1G) spanning from 1900-2020. You can download the preprocessed graph via this [link](https://drive.google.com/open?id=1a85skqsMBwnJ151QpurLFSa9o2ymc_rq). We split the data by their time: Pre-training ( t < 2014 ); Training ( 2014 <= t < 2017); Validation ( t = 2017 ); Testing ( 2018 <= t ).
+
 If you want to directly process from raw data, you can download via this [link](https://drive.google.com/open?id=1yDdVaartOCOSsQlUZs8cJcAUhmvRiBSz). After downloading it, run `preprocess_OAG.py` to extract features and store them in our data structure. 
 
 For **Reddit**, we simply download the preprocessed graph using pyG.datasets API, and then turn it into our own data structure using `preprocess_reddit.py`. We randomly split the data into different sets.
 
 ## Usage
+We first introduce the arguments to control hyperparameters. There are mainly three types of arguments, for pre-training; for dataset; for model and optimization.
 
-Coming soon.
+For pre-training, we provide arguments to control different modules for attribute and edge generation tasks:
+```
+  --attr_ratio                     FLOAT   The ratio (0~1) of attribute generation loss .       Default is 0.5.
+  --attr_type                      STR     type of attribute decoder ['text' or 'vec']          Default is 'vec'
+  --neg_samp_num                   INT     Whether to use layer-norm on the last layer.         Default is False.
+  --queue_size                     INT     Max size of adaptive embedding queue.                Default is 256.
+```  
+
+For datasets, we provide arguments to control mini-batch sampling:
+```
+  --data_dir                       STR   The address of preprocessed graph.
+  --pretrain_model_dir             STR     The address for storing the pre-trained models.
+  --sample_depth                   INT     How many layers within a mini-batch subgraph         Default is 6.
+  --sample_width                   INT   How many nodes to be sampled per layer per type        Default is 128.
+```  
+
+For both pre-training and fine-tuning, we provide arguments to control model and optimizer hyperparameters. We highlight some key arguments below:
+
+```
+  --conv_name                      STR     Name of GNN filter (model)                           Default is hgt.
+  --scheduler                      STR     Name of learning rate scheduler                      Default is cycle (for pretrain) and cosine (for fine-tuning)
+  --last_norm                      INT     Whether to use layer-norm on the last layer.         Default is False.
+  --n_layers                       INT     Number of GNN layers                                 Default is 3.
+  --prev_norm                      Bool    Whether to use layer-norm on previous layers.        Default is False.
+  --max_lr                         FLOAT   Maximum learning rate.                               Default is 1e-3 (for pretrain) and 5e-4 (for fine-tuning).  
+```  
 
 ## Pre-trained Models
 
