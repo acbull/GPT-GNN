@@ -6,7 +6,7 @@ filterwarnings("ignore")
 
 import argparse
 
-parser = argparse.ArgumentParser(description='Fine-Tuning on OAG Paper-Field (L2) classification task')
+parser = argparse.ArgumentParser(description='Fine-Tuning on OAG Author Disambiguation (AD) task')
 
 '''
     Dataset arguments
@@ -23,7 +23,12 @@ parser.add_argument('--task_name', type=str, default='AD',
 parser.add_argument('--cuda', type=int, default=2,
                     help='Avaiable GPU ID')
 parser.add_argument('--domain', type=str, default='_CS',
-                    help='CS, Medicion or All: _CS or _Med or (empty)')         
+                    help='CS, Medicion or All: _CS or _Med or (empty)')  
+parser.add_argument('--sample_depth', type=int, default=6,
+                    help='How many numbers to sample the graph')
+parser.add_argument('--sample_width', type=int, default=128,
+                    help='How many nodes to be sampled per layer per type')
+
 '''
    Model arguments 
 '''
@@ -36,12 +41,10 @@ parser.add_argument('--n_heads', type=int, default=8,
                     help='Number of attention head')
 parser.add_argument('--n_layers', type=int, default=3,
                     help='Number of GNN layers')
+parser.add_argument('--prev_norm', help='Whether to add layer-norm on the previous layers', action='store_true')
+parser.add_argument('--last_norm', help='Whether to add layer-norm on the last layers',     action='store_true')
 parser.add_argument('--dropout', type=int, default=0.2,
                     help='Dropout ratio')
-parser.add_argument('--sample_depth', type=int, default=6,
-                    help='How many numbers to sample the graph')
-parser.add_argument('--sample_width', type=int, default=128,
-                    help='How many nodes to be sampled per layer per type')
 
 '''
     Optimization arguments
@@ -49,6 +52,8 @@ parser.add_argument('--sample_width', type=int, default=128,
 parser.add_argument('--optimizer', type=str, default='adamw',
                     choices=['adamw', 'adam', 'sgd', 'adagrad'],
                     help='optimizer to use.')
+parser.add_argument('--scheduler', type=str, default='cycle',
+                    help='Name of learning rate scheduler.' , choices=['cycle', 'cosine'])
 parser.add_argument('--data_percentage', type=int, default=0.1,
                     help='Percentage of training and validation data to use')
 parser.add_argument('--n_epoch', type=int, default=100,
@@ -59,18 +64,20 @@ parser.add_argument('--n_batch', type=int, default=16,
                     help='Number of batch (sampled graphs) for each epoch') 
 parser.add_argument('--batch_size', type=int, default=256,
                     help='Number of output nodes for training')    
-parser.add_argument('--clip', type=int, default=0.25,
+parser.add_argument('--clip', type=int, default=0.5,
                     help='Gradient Norm Clipping') 
 
-
 args = parser.parse_args()
+args_print(args)
 
 if args.cuda != -1:
     device = torch.device("cuda:" + str(args.cuda))
 else:
     device = torch.device("cpu")
 
+print('Start Loading Graph Data...')
 graph = dill.load(open(os.path.join(args.data_dir, 'graph%s.pk' % args.domain), 'rb'))
+print('Finish Loading Graph Data!')
 
 target_type = 'paper'
 

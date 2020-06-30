@@ -3,16 +3,12 @@ import scipy.sparse as sp
 import torch
 from texttable import Texttable
 
-def tab_printer(args):
-    """
-    Function to print the logs in a nice tabular format.
-    :param args: Parameters used for the model.
-    """
-    args = vars(args)
-    keys = sorted(args.keys())
+def args_print(args):
+    _dict = vars(args)
     t = Texttable() 
-    t.add_rows([["Parameter", "Value"]])
-    t.add_rows([[k.replace("_", " ").capitalize(), args[k]] for k in keys])
+    t.add_row(["Parameter", "Value"])
+    for k in _dict:
+        t.add_row([k, _dict[k]])
     print(t.draw())
 
 def dcg_at_k(r, k):

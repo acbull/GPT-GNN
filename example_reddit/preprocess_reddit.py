@@ -10,6 +10,7 @@ el = defaultdict(  #target_id
 for i, j in tqdm(dataset.data.edge_index.t()):
     el[i.item()][j.item()] = 1
 
+target_type = 'def'
 graph_reddit.edge_list['def']['def']['def'] = el
 n = list(el.keys())
 degree = np.zeros(np.max(n)+1)

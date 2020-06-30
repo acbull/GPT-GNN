@@ -20,6 +20,8 @@ parser.add_argument('--neg_samp_num', type=int, default=255,
                     help='Maximum number of negative sample for each target node.')
 parser.add_argument('--queue_size', type=int, default=256,
                     help='Max size of adaptive embedding queue.')
+parser.add_argument('--w2v_dir', type=str, default='/datadrive/dataset/w2v_all',
+                    help='The address of preprocessed graph.')
 
 '''
     Dataset arguments
@@ -34,7 +36,6 @@ parser.add_argument('--sample_depth', type=int, default=6,
                     help='How many layers within a mini-batch subgraph')
 parser.add_argument('--sample_width', type=int, default=128,
                     help='How many nodes to be sampled per layer per type')
-
 
 '''
    Model arguments 
@@ -53,7 +54,6 @@ parser.add_argument('--last_norm', help='Whether to add layer-norm on the last l
 parser.add_argument('--dropout', type=int, default=0.2,
                     help='Dropout ratio')
 
-
 '''
     Optimization arguments
 '''
@@ -71,7 +71,10 @@ parser.add_argument('--batch_size', type=int, default=256,
                     help='Number of output nodes for training')    
 parser.add_argument('--clip', type=float, default=0.5,
                     help='Gradient Norm Clipping') 
+
 args = parser.parse_args()
+args_print(args)
+
 
 if args.cuda != -1:
     device = torch.device("cuda:" + str(args.cuda))
@@ -79,7 +82,10 @@ else:
     device = torch.device("cpu")
     
     
+print('Start Loading Graph Data...')
 graph = dill.load(open(args.data_dir, 'rb'))
+print('Finish Loading Graph Data!')
+
 target_type = 'def'
 rel_stop_list = ['self']
 
@@ -163,9 +169,7 @@ def prepare_data(pool):
     jobs.append(pool.apply_async(GPT_sample, args=(randint(), train_target_nodes, {1: True}, args.batch_size, feature_reddit)))
     return jobs
 
-best_val   = 100000
-train_step = 0
-stats = []
+
 pool = mp.Pool(args.n_pool)
 st = time.time()
 jobs = prepare_data(pool)
@@ -197,10 +201,10 @@ gpt_gnn.init_emb.data = node_feature[node_type == node_dict[target_type][1]].mea
 gpt_gnn = gpt_gnn.to(device)
 
 
-
+best_val   = 100000
+train_step = 0
+stats = []
 optimizer = torch.optim.AdamW(gpt_gnn.parameters(), weight_decay = 1e-2, eps=1e-06, lr = args.max_lr)
-
-
 
 if args.scheduler == 'cycle':
     scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, pct_start=0.02, anneal_strategy='linear', final_div_factor=100,\

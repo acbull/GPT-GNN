@@ -9,7 +9,7 @@ from torch_geometric.utils import softmax
 import math
 
 class HGTConv(MessagePassing):
-    def __init__(self, in_dim, out_dim, num_types, num_relations, n_heads, dropout = 0.2, use_norm = True, **kwargs):
+    def __init__(self, in_dim, out_dim, num_types, num_relations, n_heads, dropout = 0.2, use_norm = True, use_RTE = True, **kwargs):
         super(HGTConv, self).__init__(aggr='add', **kwargs)
 
         self.in_dim        = in_dim
@@ -155,12 +155,11 @@ class RelTemporalEncoding(nn.Module):
     
     
 class GeneralConv(nn.Module):
-    def __init__(self, conv_name, in_hid, out_hid, num_types, num_relations, n_heads, dropout, use_norm = True):
+    def __init__(self, conv_name, in_hid, out_hid, num_types, num_relations, n_heads, dropout, use_norm = True, use_RTE = True):
         super(GeneralConv, self).__init__()
         self.conv_name = conv_name
-        self.use_norm  = use_norm
         if self.conv_name == 'hgt':
-            self.base_conv = HGTConv(in_hid, out_hid, num_types, num_relations, n_heads, dropout, self.use_norm)
+            self.base_conv = HGTConv(in_hid, out_hid, num_types, num_relations, n_heads, dropout, use_norm, use_RTE)
         elif self.conv_name == 'gcn':
             self.base_conv = GCNConv(in_hid, out_hid)
         elif self.conv_name == 'gat':
