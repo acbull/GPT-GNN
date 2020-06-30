@@ -1,10 +1,11 @@
+# GPT-GNN: Generative Pre-Training of Graph Neural Networks
+
 <p align="center">
   <img src="./gpt-intro.png" width="600">
   <br />
   <br />
 </p>
 
-# GPT-GNN: Generative Pre-Training of Graph Neural Networks
 
 GPT-GNN is a pre-training framework to initialize GNNs by generative pre-training.
 
