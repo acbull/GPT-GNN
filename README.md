@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./gpt-intro.png" width="500">
+  <img src="./gpt-intro.png" width="800">
   <br />
   <br />
 </p>
