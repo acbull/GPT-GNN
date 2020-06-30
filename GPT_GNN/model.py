@@ -4,7 +4,7 @@ from gensim.parsing.preprocessing import *
 
 
 class GPT_GNN(nn.Module):
-    def __init__(self, gnn, rem_edge_list, attr_decoder, neg_queue_size, types, neg_samp_num, device):
+    def __init__(self, gnn, rem_edge_list, attr_decoder, types, neg_samp_num, device, neg_queue_size = 0):
         super(GPT_GNN, self).__init__()
         self.types = types
         self.gnn = gnn
@@ -162,7 +162,7 @@ class Matcher(nn.Module):
 
     
 class GNN(nn.Module):
-    def __init__(self, in_dim, n_hid, num_types, num_relations, n_heads, n_layers, dropout = 0.2, conv_name = 'hgt', prev_norm = False, last_norm = False):
+    def __init__(self, in_dim, n_hid, num_types, num_relations, n_heads, n_layers, dropout = 0.2, conv_name = 'hgt', prev_norm = False, last_norm = False, use_RTE = True):
         super(GNN, self).__init__()
         self.gcs = nn.ModuleList()
         self.num_types = num_types
@@ -173,8 +173,8 @@ class GNN(nn.Module):
         for t in range(num_types):
             self.adapt_ws.append(nn.Linear(in_dim, n_hid))
         for l in range(n_layers - 1):
-            self.gcs.append(GeneralConv(conv_name, n_hid, n_hid, num_types, num_relations, n_heads, dropout, use_norm = prev_norm))
-        self.gcs.append(GeneralConv(conv_name, n_hid, n_hid, num_types, num_relations, n_heads, dropout, use_norm = last_norm))
+            self.gcs.append(GeneralConv(conv_name, n_hid, n_hid, num_types, num_relations, n_heads, dropout, use_norm = prev_norm, use_rte = use_RTE))
+        self.gcs.append(GeneralConv(conv_name, n_hid, n_hid, num_types, num_relations, n_heads, dropout, use_norm = last_norm, use_rte = use_RTE))
 
     def forward(self, node_feature, node_type, edge_time, edge_index, edge_type):
         res = torch.zeros(node_feature.size(0), self.n_hid).to(node_feature.device)

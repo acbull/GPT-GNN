@@ -35,6 +35,8 @@ parser.add_argument('--n_heads', type=int, default=8,
                     help='Number of attention head')
 parser.add_argument('--n_layers', type=int, default=3,
                     help='Number of GNN layers')
+parser.add_argument('--prev_norm', help='Whether to add layer-norm on the previous layers', action='store_true')
+parser.add_argument('--last_norm', help='Whether to add layer-norm on the last layers',     action='store_true')
 parser.add_argument('--dropout', type=int, default=0.2,
                     help='Dropout ratio')
 parser.add_argument('--sample_depth', type=int, default=6,
@@ -71,12 +73,10 @@ else:
 
 graph = dill.load(open(os.path.join(args.data_dir, 'reddit.pk' % args.domain), 'rb'))
 
-idx = np.arange(len(graph.node_feature[target_type]))
-np.random.seed(43)
-np.random.shuffle(idx)
-train_target_nodes = idx[int(len(idx) * 0.7) : int(len(idx) * 0.8)]
-valid_target_nodes = idx[int(len(idx) * 0.8) : int(len(idx) * 0.9)]
-test_target_nodes  = idx[int(len(idx) * 0.9) : ]
+
+train_target_nodes = graph_reddit.train_target_nodes
+valid_target_nodes = graph_reddit.valid_target_nodes
+test_target_nodes  = graph_reddit.test_target_nodes
 
 types = graph.get_types()
 criterion = nn.NLLLoss()
@@ -115,9 +115,9 @@ def prepare_data(pool):
 '''
     Initialize GNN (model is specified by conv_name) and Classifier
 '''
-gnn = GNN(conv_name = args.conv_name, in_dim = len(graph_reddit.node_feature['def']['emb'].values[0]), \
-          n_hid = args.n_hid, n_heads = args.n_heads, n_layers = args.n_layers, dropout = args.dropout,\
-          num_types = len(types), num_relations = len(graph.get_meta_graph()) + 1)
+gnn = GNN(conv_name = args.conv_name, in_dim = len(graph.node_feature[target_type]['emb'].values[0]), n_hid = args.n_hid, \
+          n_heads = args.n_heads, n_layers = args.n_layers, dropout = args.dropout, num_types = len(types), \
+          num_relations = len(graph.get_meta_graph()) + 1, prev_norm = args.prev_norm, last_norm = args.last_norm, use_RTE = False)
 if args.use_pretrain:
     gnn.load_state_dict(torch.load(args.pretrain_model_dir).gnn.state_dict())
 classifier = Classifier(args.n_hid, len(cand_list)).to(device)

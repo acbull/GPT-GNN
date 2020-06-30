@@ -36,6 +36,8 @@ parser.add_argument('--n_heads', type=int, default=8,
                     help='Number of attention head')
 parser.add_argument('--n_layers', type=int, default=3,
                     help='Number of GNN layers')
+parser.add_argument('--prev_norm', help='Whether to add layer-norm on the previous layers', action='store_true')
+parser.add_argument('--last_norm', help='Whether to add layer-norm on the last layers',     action='store_true')
 parser.add_argument('--dropout', type=int, default=0.2,
                     help='Dropout ratio')
 parser.add_argument('--sample_depth', type=int, default=6,
@@ -195,7 +197,7 @@ sel_valid_pairs = {p : valid_pairs[p] for p in np.random.choice(list(valid_pairs
 '''
 gnn = GNN(conv_name = args.conv_name, in_dim = len(graph.node_feature[target_type]['emb'].values[0]) + 401, \
           n_hid = args.n_hid, n_heads = args.n_heads, n_layers = args.n_layers, dropout = args.dropout,\
-          num_types = len(types), num_relations = len(graph.get_meta_graph()) + 1, last_norm = True)
+          num_types = len(types), num_relations = len(graph.get_meta_graph()) + 1, prev_norm = args.prev_norm, last_norm = args.last_norm)
 if args.use_pretrain:
     gnn.load_state_dict(torch.load(args.pretrain_model_dir).gnn.state_dict(), strict=False)
 classifier = Classifier(args.n_hid, len(cand_list))

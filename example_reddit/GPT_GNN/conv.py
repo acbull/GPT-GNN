@@ -9,7 +9,7 @@ from torch_geometric.utils import softmax
 import math
 
 class HGTConv(MessagePassing):
-    def __init__(self, in_dim, out_dim, num_types, num_relations, n_heads, dropout = 0.2, use_norm = True, **kwargs):
+    def __init__(self, in_dim, out_dim, num_types, num_relations, n_heads, dropout = 0.2, use_norm = False, use_RTE = True, **kwargs):
         super(HGTConv, self).__init__(aggr='add', **kwargs)
 
         self.in_dim        = in_dim
@@ -21,6 +21,7 @@ class HGTConv(MessagePassing):
         self.d_k           = out_dim // n_heads
         self.sqrt_dk       = math.sqrt(self.d_k)
         self.use_norm      = use_norm
+        self.use_RTE       = use_RTE
         self.att           = None
         
         
@@ -45,7 +46,8 @@ class HGTConv(MessagePassing):
         self.relation_msg   = nn.Parameter(torch.Tensor(num_relations, n_heads, self.d_k, self.d_k))
         self.skip           = nn.Parameter(torch.ones(num_types))
         self.drop           = nn.Dropout(dropout)
-        self.emb            = RelTemporalEncoding(in_dim)
+        if use_RTE:
+            self.RTE_emb    = RelTemporalEncoding(in_dim)
         
         glorot(self.relation_att)
         glorot(self.relation_msg)
@@ -84,7 +86,10 @@ class HGTConv(MessagePassing):
                         Add tempotal encoding to source representation (j)
                     '''
                     target_node_vec = node_inp_i[idx]
-                    source_node_vec = self.emb(node_inp_j[idx], edge_time[idx])
+                    if self.use_RTE:
+                        source_node_vec = self.RTE_emb(node_inp_j[idx], edge_time[idx])
+                    else:
+                        source_node_vec = node_inp_j[idx]
 
                     '''
                         Step 1: Heterogeneous Mutual Attention

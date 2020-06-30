@@ -74,15 +74,11 @@ graph = dill.load(open(args.data_dir, 'rb'))
 target_type = 'def'
 rel_stop_list = ['self']
 
-idx = np.arange(len(graph.node_feature[target_type]))
-np.random.seed(43)
-np.random.shuffle(idx)
-pre_target_nodes   = idx[:int(len(idx) * 0.7)]
-train_target_nodes = idx[int(len(idx) * 0.7) : int(len(idx) * 0.8)]
+pre_target_nodes   = graph_reddit.pre_target_nodes
+train_target_nodes = graph_reddit.train_target_nodes
 
 pre_target_nodes = np.concatenate([pre_target_nodes, np.ones(len(pre_target_nodes))]).reshape(2, -1).transpose()
 train_target_nodes = np.concatenate([train_target_nodes, np.ones(len(train_target_nodes))]).reshape(2, -1).transpose()
-
 
 
 def GPT_sample(seed, target_nodes, time_range, batch_size, feature_extractor):
@@ -166,7 +162,7 @@ types = graph.get_types()
 
 gnn = GNN(conv_name = args.conv_name, in_dim = len(graph.node_feature[target_type]['emb'].values[0]), n_hid = args.n_hid, \
           n_heads = args.n_heads, n_layers = args.n_layers, dropout = args.dropout, num_types = len(types), \
-          num_relations = len(graph.get_meta_graph()) + 1, prev_norm = args.prev_norm, last_norm = args.last_norm)
+          num_relations = len(graph.get_meta_graph()) + 1, prev_norm = args.prev_norm, last_norm = args.last_norm, use_RTE = False)
 
 if args.attr_type == 'text':  
     from gensim.models import Word2Vec
