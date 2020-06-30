@@ -55,7 +55,12 @@ For both pre-training and fine-tuning, we provide arguments to control model and
   --prev_norm                      BOOL    Whether to use layer-norm on previous layers.        Default is False.
   --last_norm                      BOOL    Whether to use layer-norm on the last layer.         Default is False.
   --max_lr                         FLOAT   Maximum learning rate.                               Default is 1e-3 (for pretrain) and 5e-4 (for fine-tuning).  
-```  
+```
+
+The following commands pretrain a 3-layer HGT over OAG-CS:
+<p align="center">
+  <img width="500" src="capsgnn.gif">
+</p>
 
 ## Pre-trained Models
 
