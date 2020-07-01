@@ -193,7 +193,7 @@ gnn = GNN(conv_name = args.conv_name, in_dim = len(graph.node_feature[target_typ
           n_hid = args.n_hid, n_heads = args.n_heads, n_layers = args.n_layers, dropout = args.dropout,\
           num_types = len(types), num_relations = len(graph.get_meta_graph()) + 1)
 if args.use_pretrain:
-    gnn.load_state_dict(torch.load(args.pretrain_model_dir), strict = False)
+    gnn.load_state_dict(load_gnn(torch.load(args.pretrain_model_dir)), strict = False)
 classifier = Classifier(args.n_hid, len(cand_list)).to(device)
 
 model = nn.Sequential(gnn, classifier)

@@ -94,3 +94,17 @@ def feature_reddit(layer_data, graph):
         if _type == 'def':
             attr = feature[_type]
     return feature, times, indxs, attr
+
+def load_gnn(_dict):
+    out_dict = {}
+    for key in _dict:
+        if 'gnn' in key:
+            out_dict[key[4:]] = _dict[key]
+    return OrderedDict(out_dict)
+
+def load_gnn(_dict):
+    out_dict = {}
+    for key in _dict:
+        if 'gnn' in key:
+            out_dict[key[4:]] = _dict[key]
+    return OrderedDict(out_dict)

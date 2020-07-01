@@ -6,6 +6,8 @@ from gensim.parsing.preprocessing import *
 class GPT_GNN(nn.Module):
     def __init__(self, gnn, rem_edge_list, attr_decoder, types, neg_samp_num, device, neg_queue_size = 0):
         super(GPT_GNN, self).__init__()
+        if gnn is None:
+            return
         self.types = types
         self.gnn = gnn
         self.params = nn.ModuleList()

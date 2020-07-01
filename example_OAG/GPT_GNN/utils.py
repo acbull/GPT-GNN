@@ -2,6 +2,7 @@ import numpy as np
 import scipy.sparse as sp
 import torch
 from texttable import Texttable
+from collections import OrderedDict
 
 def args_print(args):
     _dict = vars(args)
@@ -94,3 +95,10 @@ def feature_reddit(layer_data, graph):
         if _type == 'def':
             attr = feature[_type]
     return feature, times, indxs, attr
+
+def load_gnn(_dict):
+    out_dict = {}
+    for key in _dict:
+        if 'gnn' in key:
+            out_dict[key[4:]] = _dict[key]
+    return OrderedDict(out_dict)
