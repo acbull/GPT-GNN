@@ -59,7 +59,7 @@ For both pre-training and fine-tuning, we provide arguments to control model and
 
 The following commands pretrain a 4-layer HGT over OAG-CS:
 ```bash
-python pretrain_OAG.py --attr_type text --n_layers 4 --prev_norm --pretrain_model_dir /datadrive/models/test_4_norm
+python pretrain_OAG.py --attr_type text --conv_name hgt --n_layers 4 --prev_norm --pretrain_model_dir /datadrive/models/test_4_norm
 ```
 
 <p align="center">
