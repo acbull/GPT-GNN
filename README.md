@@ -57,7 +57,11 @@ For both pre-training and fine-tuning, we provide arguments to control model and
   --max_lr                         FLOAT   Maximum learning rate.                               Default is 1e-3 (for pretrain) and 5e-4 (for fine-tuning).  
 ```
 
-The following commands pretrain a 3-layer HGT over OAG-CS:
+The following commands pretrain a 4-layer HGT over OAG-CS:
+```bash
+python pretrain_OAG.py --attr_type text --n_layers 4 --prev_norm --pretrain_model_dir /datadrive/models/test_4_norm
+```
+
 <p align="center">
   <img width="800" src="images/pretrain_OAG.gif">
 </p>
