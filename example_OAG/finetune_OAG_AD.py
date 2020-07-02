@@ -236,6 +236,7 @@ gnn =  GNN(conv_name = 'hgt', in_dim = len(graph.node_feature['paper']['emb'].va
           num_types = len(graph.get_types()), num_relations = len(graph.get_meta_graph()) + 1)
 if args.use_pretrain:
     gnn.load_state_dict(load_gnn(torch.load(args.pretrain_model_dir)), strict = False)
+    print('Load Pre-trained Model from (%s)' % args.pretrain_model_dir)
 matcher = Matcher(args.n_hid)
 
 model = nn.Sequential(gnn, matcher).to(device)

@@ -91,7 +91,7 @@ def node_classification_sample(seed, nodes, time_range):
     np.random.seed(seed)
     samp_nodes = np.random.choice(nodes, args.batch_size, replace = False)
     feature, times, edge_list, _, texts = sample_subgraph(graph, time_range, \
-                inp = {'def': np.concatenate([samp_nodes, np.ones(args.batch_size)]).reshape(2, -1).transpose()}, \
+                inp = {target_type: np.concatenate([samp_nodes, np.ones(args.batch_size)]).reshape(2, -1).transpose()}, \
                 sampled_depth = args.sample_depth, sampled_number = args.sample_width, feature_extractor = feature_reddit)
     
     node_feature, node_type, edge_time, edge_index, edge_type, node_dict, edge_dict = \
@@ -131,9 +131,10 @@ gnn = GNN(conv_name = args.conv_name, in_dim = len(graph.node_feature[target_typ
           num_relations = len(graph.get_meta_graph()) + 1, prev_norm = args.prev_norm, last_norm = args.last_norm, use_RTE = False)
 if args.use_pretrain:
     gnn.load_state_dict(load_gnn(torch.load(args.pretrain_model_dir)), strict = False)
-classifier = Classifier(args.n_hid, len(cand_list)).to(device)
+    print('Load Pre-trained Model from (%s)' % args.pretrain_model_dir)
+classifier = Classifier(args.n_hid, graph.y.max().item() + 1)
 
-model = nn.Sequential(gnn, classifier)
+model = nn.Sequential(gnn, classifier).to(device)
 
 
 optimizer = torch.optim.AdamW(model.parameters(), lr = 5e-4)
