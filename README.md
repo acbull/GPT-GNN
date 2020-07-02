@@ -66,15 +66,15 @@ python pretrain_OAG.py --attr_type text --conv_name hgt --n_layers 3 --pretrain_
   <img width="800" src="images/pretrain_OAG.gif">
 </p>
 
-The following commands use the pre-trained model as initialization and finetune on the paper-field classification task:
+The following commands use the pre-trained model as initialization and finetune on the paper-field classification task using 10% of training and validation data:
 ```bash
-python finetune_OAG_PF.py --use_pretrain --pretrain_model_dir /datadrive/models/gta_all_cs3 --n_layer 3
+python finetune_OAG_PF.py --use_pretrain --pretrain_model_dir /datadrive/models/gta_all_cs3 --n_layer 3 --data_percentage 0.1
 ```
 
 
 ## Pre-trained Models
 
-1. The 3-layer HGT model pre-trained over OAG-CS Time-Transfer Setting via [this link](https://drive.google.com/file/d/1OyIRfpNXjaD0TiRF-_Upfl5hix3is5ca/view?usp=sharing)
+1. The 3-layer HGT model pre-trained over OAG-CS under Time-Transfer Setting via [this link](https://drive.google.com/file/d/1OyIRfpNXjaD0TiRF-_Upfl5hix3is5ca/view?usp=sharing)
 2. The 3-layer HGT model pre-trained over Reddit via [this link](https://drive.google.com/file/d/1Ja4PJT2bkFH0qgoWXjGBjByIFPco4h-S/view?usp=sharing)
 
 
