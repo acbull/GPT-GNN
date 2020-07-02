@@ -94,7 +94,7 @@ python finetune_OAG_PF.py --use_pretrain --pretrain_model_dir /datadrive/models/
 
 
 
-### Reference
+### Citation
 
 Please consider citing the following paper when using our code for your application.
 
