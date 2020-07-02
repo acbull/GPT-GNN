@@ -73,12 +73,12 @@ if args.cuda != -1:
 else:
     device = torch.device("cpu")
 
-graph = dill.load(open(os.path.join(args.data_dir, 'reddit.pk'), 'rb'))
+graph = dill.load(open(os.path.join(args.data_dir, 'graph_reddit.pk'), 'rb'))
 
-
-train_target_nodes = graph_reddit.train_target_nodes
-valid_target_nodes = graph_reddit.valid_target_nodes
-test_target_nodes  = graph_reddit.test_target_nodes
+target_type = 'def'
+train_target_nodes = graph.train_target_nodes
+valid_target_nodes = graph.valid_target_nodes
+test_target_nodes  = graph.test_target_nodes
 
 types = graph.get_types()
 criterion = nn.NLLLoss()
@@ -90,15 +90,15 @@ def node_classification_sample(seed, nodes, time_range):
     '''
     np.random.seed(seed)
     samp_nodes = np.random.choice(nodes, args.batch_size, replace = False)
-    feature, times, edge_list, _, texts = sample_subgraph(graph_reddit, time_range, \
+    feature, times, edge_list, _, texts = sample_subgraph(graph, time_range, \
                 inp = {'def': np.concatenate([samp_nodes, np.ones(args.batch_size)]).reshape(2, -1).transpose()}, \
                 sampled_depth = args.sample_depth, sampled_number = args.sample_width, feature_extractor = feature_reddit)
     
     node_feature, node_type, edge_time, edge_index, edge_type, node_dict, edge_dict = \
-            to_torch(feature, times, edge_list, graph_reddit)
+            to_torch(feature, times, edge_list, graph)
 
     x_ids = np.arange(args.batch_size)
-    return node_feature, node_type, edge_time, edge_index, edge_type, x_ids, graph_reddit.y[samp_nodes]
+    return node_feature, node_type, edge_time, edge_index, edge_type, x_ids, graph.y[samp_nodes]
     
     
 def prepare_data(pool):
@@ -107,9 +107,9 @@ def prepare_data(pool):
     '''
     jobs = []
     for batch_id in np.arange(args.n_batch):
-        p = pool.apply_async(node_classification_sample, args=(randint(), train_nodes, {1: True}))
+        p = pool.apply_async(node_classification_sample, args=(randint(), train_target_nodes, {1: True}))
         jobs.append(p)
-    p = pool.apply_async(node_classification_sample, args=(randint(), valid_nodes, {1: True}))
+    p = pool.apply_async(node_classification_sample, args=(randint(), valid_target_nodes, {1: True}))
     jobs.append(p)
     return jobs
 
@@ -223,7 +223,7 @@ with torch.no_grad():
     test_res = []
     for _ in range(10):
         node_feature, node_type, edge_time, edge_index, edge_type, x_ids, ylabel = \
-                    node_classification_sample(randint(), test_nodes, {1: True})
+                    node_classification_sample(randint(), test_target_nodes, {1: True})
         paper_rep = gnn.forward(node_feature.to(device), node_type.to(device), \
                     edge_time.to(device), edge_index.to(device), edge_type.to(device))[x_ids]
         res = classifier.forward(paper_rep)
