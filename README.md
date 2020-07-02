@@ -57,14 +57,20 @@ For both pre-training and fine-tuning, we provide arguments to control model and
   --max_lr                         FLOAT   Maximum learning rate.                               Default is 1e-3 (for pretrain) and 5e-4 (for fine-tuning).  
 ```
 
-The following commands pretrain a 4-layer HGT over OAG-CS:
+The following commands pretrain a 3-layer HGT over OAG-CS:
 ```bash
-python pretrain_OAG.py --attr_type text --conv_name hgt --n_layers 4 --prev_norm --pretrain_model_dir /datadrive/models/test_4_norm
+python pretrain_OAG.py --attr_type text --conv_name hgt --n_layers 3 --pretrain_model_dir /datadrive/models/gta_all_cs3
 ```
 
 <p align="center">
   <img width="800" src="images/pretrain_OAG.gif">
 </p>
+
+The following commands use the pre-trained model as initialization and finetune on the paper-field classification task:
+```bash
+python finetune_OAG_PF.py --use_pretrain --pretrain_model_dir /datadrive/models/gta_all_cs3 --n_layer 3
+```
+
 
 ## Pre-trained Models
 
