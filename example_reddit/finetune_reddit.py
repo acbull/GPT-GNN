@@ -73,7 +73,7 @@ if args.cuda != -1:
 else:
     device = torch.device("cpu")
 
-graph = dill.load(open(os.path.join(args.data_dir, 'reddit.pk' % args.domain), 'rb'))
+graph = dill.load(open(os.path.join(args.data_dir, 'reddit.pk'), 'rb'))
 
 
 train_target_nodes = graph_reddit.train_target_nodes
