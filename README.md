@@ -74,7 +74,8 @@ python finetune_OAG_PF.py --use_pretrain --pretrain_model_dir /datadrive/models/
 
 ## Pre-trained Models
 
-Coming soon.
+The 3-layer HGT model pre-trained over OAG-CS Time-Transfer Setting via [this link](https://drive.google.com/file/d/1OyIRfpNXjaD0TiRF-_Upfl5hix3is5ca/view?usp=sharing)
+The 3-layer HGT model pre-trained over Reddit via [this link](https://drive.google.com/file/d/1Ja4PJT2bkFH0qgoWXjGBjByIFPco4h-S/view?usp=sharing)
 
 
 
