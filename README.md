@@ -9,7 +9,7 @@
 
 GPT-GNN is a pre-training framework to initialize GNNs by generative pre-training. It can be applied to large-scale and heterogensous graphs.
 
-You can see our KDD 2020 paper [“**Generative Pre-Training of Graph Neural Networks**”](https://arxiv.org/pdf/2006.15437.pdf) for more details.
+You can see our KDD 2020 paper [“**Generative Pre-Training of Graph Neural Networks**”](https://arxiv.org/abs/2006.15437) for more details.
 
 
 ## Overview
