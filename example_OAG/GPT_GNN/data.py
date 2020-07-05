@@ -191,21 +191,22 @@ def sample_subgraph(graph, time_range, sampled_depth = 2, sampled_number = 8, in
     '''
     for target_type in graph.edge_list:
         te = graph.edge_list[target_type]
+        tld = layer_data[target_type]
         for source_type in te:
             tes = te[source_type]
+            sld  = layer_data[source_type]
             for relation_type in tes:
                 tesr = tes[relation_type]
-                for target_key in layer_data[target_type]:
-                    target_ser = layer_data[target_type][target_key][0]
+                for target_key in tld:
                     if target_key not in tesr:
                         continue
-                    tesrt = tesr[target_key]
-                    for source_key in layer_data[source_type]:
-                        source_ser = layer_data[source_type][source_key][0]
+                    target_ser = tld[target_key][0]
+                    for source_key in tesr[target_key]:
                         '''
                             Check whether each link (target_id, source_id) exist in original adjacancy matrix
                         '''
-                        if source_key in tesrt:
+                        if source_key in sld:
+                            source_ser = sld[source_key][0]
                             edge_list[target_type][source_type][relation_type] += [[target_ser, source_ser]]
     return feature, times, edge_list, indxs, texts
 
