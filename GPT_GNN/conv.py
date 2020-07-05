@@ -21,6 +21,7 @@ class HGTConv(MessagePassing):
         self.d_k           = out_dim // n_heads
         self.sqrt_dk       = math.sqrt(self.d_k)
         self.use_norm      = use_norm
+        self.use_RTE       = use_RTE:
         self.att           = None
         
         
@@ -45,7 +46,9 @@ class HGTConv(MessagePassing):
         self.relation_msg   = nn.Parameter(torch.Tensor(num_relations, n_heads, self.d_k, self.d_k))
         self.skip           = nn.Parameter(torch.ones(num_types))
         self.drop           = nn.Dropout(dropout)
-        self.emb            = RelTemporalEncoding(in_dim)
+        
+        if self.use_RTE:
+            self.emb            = RelTemporalEncoding(in_dim)
         
         glorot(self.relation_att)
         glorot(self.relation_msg)
@@ -84,8 +87,9 @@ class HGTConv(MessagePassing):
                         Add tempotal encoding to source representation (j)
                     '''
                     target_node_vec = node_inp_i[idx]
-                    source_node_vec = self.emb(node_inp_j[idx], edge_time[idx])
-
+                    source_node_vec = node_inp_j[idx]
+                    if self.use_RTE:
+                        source_node_vec = self.emb(source_node_vec, edge_time[idx])
                     '''
                         Step 1: Heterogeneous Mutual Attention
                     '''
@@ -172,4 +176,3 @@ class GeneralConv(nn.Module):
         elif self.conv_name == 'gat':
             return self.base_conv(meta_xs, edge_index)
     
-  
