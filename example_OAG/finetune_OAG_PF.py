@@ -201,9 +201,9 @@ sel_valid_pairs = {p : valid_pairs[p] for p in np.random.choice(list(valid_pairs
 '''
     Initialize GNN (model is specified by conv_name) and Classifier
 '''
-gnn = GNN(conv_name = args.conv_name, in_dim = len(graph.node_feature[target_type]['emb'].values[0]) + 401, \
-          n_hid = args.n_hid, n_heads = args.n_heads, n_layers = args.n_layers, dropout = args.dropout,\
-          num_types = len(types), num_relations = len(graph.get_meta_graph()) + 1, prev_norm = args.prev_norm, last_norm = args.last_norm)
+gnn = GNN(conv_name = args.conv_name, in_dim = len(graph.node_feature[target_type]['emb'].values[0]) + 401, n_hid = args.n_hid, \
+          n_heads = args.n_heads, n_layers = args.n_layers, dropout = args.dropout, num_types = len(types), \
+          num_relations = len(graph.get_meta_graph()) + 1, prev_norm = args.prev_norm, last_norm = args.last_norm)
 if args.use_pretrain:
     gnn.load_state_dict(load_gnn(torch.load(args.pretrain_model_dir)), strict = False)
     print('Load Pre-trained Model from (%s)' % args.pretrain_model_dir)
