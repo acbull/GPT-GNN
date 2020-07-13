@@ -194,7 +194,7 @@ types = graph.get_types()
 
 gnn = GNN(conv_name = args.conv_name, in_dim = len(graph.node_feature[target_type]['emb'].values[0]) + 401, n_hid = args.n_hid, \
           n_heads = args.n_heads, n_layers = args.n_layers, dropout = args.dropout, num_types = len(types), \
-          num_relations = len(graph.get_meta_graph()) + 1, prev_norm = args.prev_norm, last_norm = args.last_norm, use_RTE = False)
+          num_relations = len(graph.get_meta_graph()) + 1, prev_norm = args.prev_norm, last_norm = args.last_norm)
 
 
 if args.attr_type == 'text':  
