@@ -82,7 +82,7 @@ else:
     device = torch.device("cpu")
 
 print('Start Loading Graph Data...')
-graph = dill.load(open(args.data_dir, 'rb'))
+graph = renamed_load(open(args.data_dir, 'rb'))
 print('Finish Loading Graph Data!')
 
 pre_range   = {t: True for t in graph.times if t != None and t < 2014}
