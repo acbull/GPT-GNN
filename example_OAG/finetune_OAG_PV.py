@@ -76,7 +76,7 @@ else:
     device = torch.device("cpu")
 
 print('Start Loading Graph Data...')
-graph = dill.load(open(os.path.join(args.data_dir, 'graph%s.pk' % args.domain), 'rb'))
+graph = renamed_load(open(os.path.join(args.data_dir, 'graph%s.pk' % args.domain), 'rb'))
 print('Finish Loading Graph Data!')
 
 target_type = 'paper'
