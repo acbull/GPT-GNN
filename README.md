@@ -26,6 +26,23 @@ If you want to directly process from raw data, you can download via [this link](
 
 For **Reddit**, we simply download the preprocessed graph using pyG.datasets API, and then turn it into our own data structure using `preprocess_reddit.py`. We randomly split the data into different sets.
 
+## Setup
+
+This implementation is based on pytorch_geometric. To run the code, you need the following dependencies:
+
+- [Pytorch 1.3.0](https://pytorch.org/)
+- [pytorch_geometric 1.3.2](https://pytorch-geometric.readthedocs.io/)
+  - torch-cluster==1.4.5
+  - torch-scatter==1.3.2
+  - torch-sparse==0.4.3
+- [gensim](https://github.com/RaRe-Technologies/gensim)
+- [sklearn](https://github.com/scikit-learn/scikit-learn)
+- [tqdm](https://github.com/tqdm/tqdm)
+- [dill](https://github.com/uqfoundation/dill)
+- [pandas](https://github.com/pandas-dev/pandas)
+
+You can simply run ```pip install -r requirements.txt``` to install all the necessary packages.
+
 ## Usage
 We first introduce the arguments to control hyperparameters. There are mainly three types of arguments, for pre-training; for dataset; for model and optimization.
 
