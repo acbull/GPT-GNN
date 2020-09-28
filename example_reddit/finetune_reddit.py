@@ -2,6 +2,8 @@ import sys
 from GPT_GNN.data import *
 from GPT_GNN.model import *
 from warnings import filterwarnings
+
+from sklearn.metrics import f1_score
 filterwarnings("ignore")
 
 import argparse
