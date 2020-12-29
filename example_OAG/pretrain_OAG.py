@@ -96,7 +96,7 @@ target_type = 'paper'
 rel_stop_list = ['self', 'rev_PF_in_L0', 'rev_PF_in_L5', 'rev_PV_Repository', 'rev_PV_Patent']
 
 
-for p_id, _time in enumerate(list(graph.node_feature[target_type]['time'])):
+for p_id, _time in graph.node_feature[target_type]['time'].iteritems():
     if _time in pre_range:
         pre_target_nodes += [[p_id, _time]]
     elif _time in train_range:
