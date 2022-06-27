@@ -83,7 +83,7 @@ else:
 
 
 print('Start Loading Graph Data...')
-graph_reddit = dill.load(open(args.data_dir, 'rb'))
+graph_reddit: Graph = dill.load(open(args.data_dir, 'rb'))
 print('Finish Loading Graph Data!')
 
 target_type = 'def'
@@ -100,7 +100,7 @@ def GPT_sample(seed, target_nodes, time_range, batch_size, feature_extractor):
     np.random.seed(seed)
     samp_target_nodes = target_nodes[np.random.choice(len(target_nodes), batch_size)]
     threshold   = 0.5
-    feature, times, edge_list, _, attr = sample_subgraph(graph, time_range, \
+    feature, times, edge_list, _, attr = sample_subgraph(graph_reddit, time_range, \
                 inp = {target_type: samp_target_nodes}, feature_extractor = feature_extractor, \
                     sampled_depth = args.sample_depth, sampled_number = args.sample_width)
     rem_edge_list = defaultdict(  #source_type
@@ -156,7 +156,7 @@ def GPT_sample(seed, target_nodes, time_range, batch_size, feature_extractor):
             rem_edge_lists[source_type][relation_type] = np.array(rem_edge_list[source_type][relation_type])
     del rem_edge_list
           
-    return to_torch(feature, times, edge_list, graph), rem_edge_lists, ori_list, \
+    return to_torch(feature, times, edge_list, graph_reddit), rem_edge_lists, ori_list, \
             attr[:batch_size], (n_target_nodes, n_target_nodes + batch_size)
 
 
@@ -178,12 +178,12 @@ repeat_num = int(len(pre_target_nodes) / args.batch_size // args.n_batch)
 
 data, rem_edge_list, ori_edge_list, _, _ = GPT_sample(randint(), pre_target_nodes, {1: True}, args.batch_size, feature_reddit)
 node_feature, node_type, edge_time, edge_index, edge_type, node_dict, edge_dict = data
-types = graph.get_types()
+types = graph_reddit.get_types()
 
 
-gnn = GNN(conv_name = args.conv_name, in_dim = len(graph.node_feature[target_type]['emb'].values[0]), n_hid = args.n_hid, \
+gnn = GNN(conv_name = args.conv_name, in_dim = len(graph_reddit.node_feature[target_type]['emb'].values[0]), n_hid = args.n_hid, \
           n_heads = args.n_heads, n_layers = args.n_layers, dropout = args.dropout, num_types = len(types), \
-          num_relations = len(graph.get_meta_graph()) + 1, prev_norm = args.prev_norm, last_norm = args.last_norm, use_RTE = False)
+          num_relations = len(graph_reddit.get_meta_graph()) + 1, prev_norm = args.prev_norm, last_norm = args.last_norm, use_RTE = False)
 
 if args.attr_type == 'text':  
     from gensim.models import Word2Vec
