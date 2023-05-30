@@ -50,7 +50,7 @@ For pre-training, we provide arguments to control different modules for attribut
 ```
   --attr_ratio                     FLOAT   The ratio (0~1) of attribute generation loss .       Default is 0.5.
   --attr_type                      STR     type of attribute decoder ['text' or 'vec']          Default is 'vec'
-  --neg_samp_num                   INT     Whether to use layer-norm on the last layer.         Default is False.
+  --neg_samp_num                   BOOL     Whether to use layer-norm on the last layer.         Default is False.
   --queue_size                     INT     Max size of adaptive embedding queue.                Default is 256.
 ```  
 
