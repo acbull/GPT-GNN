@@ -11,12 +11,12 @@ parser = argparse.ArgumentParser(description='Fine-Tuning on OAG Paper-Field (L2
 '''
     Dataset arguments
 '''
-parser.add_argument('--data_dir', type=str, default='/datadrive/dataset',
+parser.add_argument('--data_dir', type=str, default='datadrive/dataset',
                     help='The address of preprocessed graph.')
 parser.add_argument('--use_pretrain', help='Whether to use pre-trained model', action='store_true')
-parser.add_argument('--pretrain_model_dir', type=str, default='/datadrive/models/gpt_all_cs',
+parser.add_argument('--pretrain_model_dir', type=str, default='datadrive/models/gpt_all_cs',
                     help='The address for pretrained model.')
-parser.add_argument('--model_dir', type=str, default='/datadrive/models',
+parser.add_argument('--model_dir', type=str, default='datadrive/models',
                     help='The address for storing the models and optimization results.')
 parser.add_argument('--task_name', type=str, default='PF',
                     help='The name of the stored models and optimization results.')
@@ -55,7 +55,7 @@ parser.add_argument('--optimizer', type=str, default='adamw',
                     help='optimizer to use.')
 parser.add_argument('--scheduler', type=str, default='cycle',
                     help='Name of learning rate scheduler.' , choices=['cycle', 'cosine'])
-parser.add_argument('--data_percentage', type=int, default=0.1,
+parser.add_argument('--data_percentage', type=float, default=0.1,
                     help='Percentage of training and validation data to use')
 parser.add_argument('--n_epoch', type=int, default=50,
                     help='Number of epoch to run')

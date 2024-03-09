@@ -20,15 +20,15 @@ parser.add_argument('--neg_samp_num', type=int, default=255,
                     help='Maximum number of negative sample for each target node.')
 parser.add_argument('--queue_size', type=int, default=256,
                     help='Max size of adaptive embedding queue.')
-parser.add_argument('--w2v_dir', type=str, default='/datadrive/dataset/w2v_all',
+parser.add_argument('--w2v_dir', type=str, default='datadrive/dataset/w2v_all',
                     help='The address of preprocessed graph.')
 
 '''
     Dataset arguments
 '''
-parser.add_argument('--data_dir', type=str, default='/datadrive/dataset/graph_CS.pk',
+parser.add_argument('--data_dir', type=str, default='datadrive/dataset/graph_CS.pk',
                     help='The address of preprocessed graph.')
-parser.add_argument('--pretrain_model_dir', type=str, default='/datadrive/models/test',
+parser.add_argument('--pretrain_model_dir', type=str, default='datadrive/models/test',
                     help='The address for storing the models and optimization results.')
 parser.add_argument('--cuda', type=int, default=2,
                     help='Avaiable GPU ID')      
